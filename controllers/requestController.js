@@ -1,22 +1,36 @@
-// controllers/requestController.js
 import Request from "../models/request.js";
 
-export const createRequest = async (req, res) => {
+export const getAllRequests = async (req, res, next) => {
   try {
-    const { type, details } = req.body;
-    const request = new Request({ type, details, userId: req.userId });
-    await request.save();
-    res.status(201).json(request);
+    const { page = 1, limit = 10, status } = req.query;
+    const query = status
+      ? { userId: req.userId, status }
+      : { userId: req.userId };
+    const options = {
+      page: parseInt(page, 10),
+      limit: parseInt(limit, 10),
+    };
+    const requests = await Request.paginate(query, options);
+    res.json(requests);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    next(error);
   }
 };
 
-export const getAllRequests = async (req, res) => {
+export const updateRequestStatus = async (req, res, next) => {
   try {
-    const requests = await Request.find({ userId: req.userId });
-    res.json(requests);
+    const { requestId } = req.params;
+    const { status } = req.body;
+    const request = await Request.findOneAndUpdate(
+      { _id: requestId, userId: req.userId },
+      { status },
+      { new: true }
+    );
+    if (!request) {
+      return res.status(404).json({ message: "Request not found" });
+    }
+    res.json(request);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error);
   }
 };

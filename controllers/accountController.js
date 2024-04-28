@@ -1,8 +1,7 @@
-// controllers/accountController.js
 import bcrypt from "bcrypt";
 import User from "../models/user.js";
 
-export const updateAccount = async (req, res) => {
+export const updateAccount = async (req, res, next) => {
   try {
     const { username, email, password } = req.body;
     const user = await User.findById(req.userId);
@@ -19,6 +18,6 @@ export const updateAccount = async (req, res) => {
     await user.save();
     res.json({ message: "Account updated successfully" });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error);
   }
 };

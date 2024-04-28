@@ -1,9 +1,9 @@
 import express from "express";
 import authMiddleware from "../middleware/authMiddleware.js";
-import { updateAccount } from "../controllers/accountController.js";
+import { getDashboardData } from "../controllers/adminController.js";
 
 const router = express.Router();
 
-router.put("/account", authMiddleware, updateAccount);
+router.get("/dashboard", authMiddleware, getDashboardData);
 
 export default router;
